@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  app-env: dev
+  client-id: "214950032845-5p6a5csm856h75pne1ac85ktdb3enu0b.apps.googleusercontent.com"
+  log-level: info

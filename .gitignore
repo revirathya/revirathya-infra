@@ -1,0 +1,4 @@
+# Secrets
+clusters/**/secrets/*.yaml
+!clusters/**/secrets/*.example.yaml
+credentials.yaml

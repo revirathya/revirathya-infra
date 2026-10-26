@@ -1,0 +1,48 @@
+default_install_hook_types: [pre-commit, commit-msg]
+
+repos:
+  # General file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: detect-private-key
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+
+
+  # Secret value in any file
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      # Real secret manifests must never be commited (even with `git add -f`)
+      - id: block-secret-manifests
+        name: block real secret manifests (commit *.example.yaml instead)
+        language: fail
+        entry: "Secret manifests staged: commit the *.example.yaml version"
+        files: '(^|/)secrets/[^/]+\.ya?ml$|(^|/)credentials\.ya?ml$'
+        exclude: '\.example\.ya?ml$'
+
+      # Validate the bulit Kustomize output againts k8s + CRD schemas
+      - id: kubeconform
+        name: validate kubernetes manifests
+        language: system
+        entry: scripts/validate-manifests.sh
+        files: '^clusters/.*\.ya?ml$'
+        pass_filenames: false
+
+      # Reuse conventional commits scripts
+      - id: conventional-commit
+        name: conventional commit message
+        language: script
+        entry: .githooks/commit-msg
+        stages: [commit-msg]
